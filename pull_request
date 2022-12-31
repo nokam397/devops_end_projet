@@ -1,0 +1,89 @@
+piVersion: apps/v1
+kind: Deployment
+metadata:
+  name: goreleser
+  labels:
+    app: web
+spec:
+  selector:
+    matchLabels:
+      app: web
+  replicas: 5
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+       —name: nginx
+          image: nginx
+          ports:
+           —containerPort: 80
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 5
+
+
+            # .goreleaser.yaml
+dockers:
+  # You can have multiple Docker images.
+  -
+    # ID of the image, needed if you want to filter by it later on (e.g. on custom publishers).
+    id: myimg
+
+    # GOOS of the built binaries/packages that should be used.
+    # Default: `linux`.
+    goos: linux
+
+    # GOARCH of the built binaries/packages that should be used.
+    # Default: `amd64`.
+    goarch: amd64
+
+    # GOARM of the built binaries/packages that should be used.
+    # Default: `6`.
+    goarm: ''
+
+    # GOAMD64 of the built binaries/packages that should be used.
+    # Default: `v1`.
+    goamd64: 'v2'
+
+    # IDs to filter the binaries/packages.
+    # Default: `empty`.
+    ids:
+    - mybuild
+    - mynfpm
+
+    # Templates of the Docker image names.
+    image_templates:
+    - "myuser/myimage:latest"
+    - "myuser/myimage:{{ .Tag }}"
+    - "myuser/myimage:{{ .Tag }}-{{ .Env.GO_VERSION }}"
+    - "myuser/myimage:v{{ .Major }}"
+    - "gcr.io/myuser/myimage:latest"
+
+# .goreleaser.yaml
+project_name: foo
+dockers:
+  -
+    image_templates:
+    - "nokam200/{{devops_end}}"
+
+
+    skip_build: false
+    skip_push: false
+
+
+    dockerfile: '{{ .Env.DOCKERFILE }}'
+
+
+
+
+    - --tls-verify=false
+
+
+    - config.yml
